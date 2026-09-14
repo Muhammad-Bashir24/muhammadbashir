@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import '../../core/responsive/responsive_layout.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/portfolio_data/portfolio_config.dart';
+import '../widgets/custom_toast.dart';
 
 class ContactSection extends StatefulWidget {
   const ContactSection({super.key});
@@ -12,25 +16,67 @@ class ContactSection extends StatefulWidget {
 
 class _ContactSectionState extends State<ContactSection> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _subjectController = TextEditingController();
+  final _messageController = TextEditingController();
   bool _isSubmitting = false;
 
-  void _submitForm() {
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    _subjectController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submitForm() async {
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isSubmitting = true;
       });
-      // Simulate network delay
-      Future.delayed(const Duration(seconds: 2), () {
+
+      try {
+        final response = await http.post(
+          Uri.parse('https://api.emailjs.com/api/v1.0/email/send'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            'service_id': dotenv.env['EMAILJS_SERVICE_ID'] ?? '',
+            'template_id': dotenv.env['EMAILJS_TEMPLATE_ID'] ?? '',
+            'user_id': dotenv.env['EMAILJS_PUBLIC_KEY'] ?? '',
+            'template_params': {
+              'user_name': _nameController.text,
+              'user_email': _emailController.text,
+              'user_subject': _subjectController.text,
+              'user_message': _messageController.text,
+            },
+          }),
+        );
+
+        if (!mounted) return;
+
         setState(() {
           _isSubmitting = false;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Message sent successfully!'),
-            backgroundColor: AppColors.accentGreen,
-          ),
-        );
-      });
+
+        if (response.statusCode == 200) {
+          _nameController.clear();
+          _emailController.clear();
+          _subjectController.clear();
+          _messageController.clear();
+
+          CustomToast.show(context, 'Message sent successfully!');
+        } else {
+          CustomToast.show(context, 'Failed to send message. Please try again.', isError: true);
+        }
+      } catch (e) {
+        if (!mounted) return;
+        setState(() {
+          _isSubmitting = false;
+        });
+        CustomToast.show(context, 'An error occurred. Please check your connection.', isError: true);
+      }
     }
   }
 
@@ -107,6 +153,7 @@ class _ContactSectionState extends State<ContactSection> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextFormField(
+                      controller: _nameController,
                       decoration: _inputDecoration('Name'),
                       validator: (value) => value == null || value.isEmpty
                           ? 'Please enter your name'
@@ -114,6 +161,7 @@ class _ContactSectionState extends State<ContactSection> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _emailController,
                       decoration: _inputDecoration('Email'),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
@@ -127,6 +175,7 @@ class _ContactSectionState extends State<ContactSection> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _subjectController,
                       decoration: _inputDecoration('Subject'),
                       validator: (value) => value == null || value.isEmpty
                           ? 'Please enter a subject'
@@ -134,6 +183,7 @@ class _ContactSectionState extends State<ContactSection> {
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
+                      controller: _messageController,
                       maxLines: 5,
                       decoration: _inputDecoration('Message'),
                       validator: (value) => value == null || value.isEmpty
