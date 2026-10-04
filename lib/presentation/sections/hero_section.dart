@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/responsive/responsive_layout.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/portfolio_data/portfolio_config.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class HeroSection extends StatelessWidget {
   final Function(String) onNavTap;
@@ -67,6 +68,15 @@ class HeroSection extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () => onNavTap('Projects'),
                       child: const Text('View My Work'),
+                    ),
+                    OutlinedButton(
+                      onPressed: () async {
+                        final Uri url = Uri.parse('assets/assets/muhammadbashirolatundun_resume.pdf');
+                        if (!await launchUrl(url, webOnlyWindowName: '_blank')) {
+                          debugPrint('Could not launch resume URL');
+                        }
+                      },
+                      child: const Text('View Resume'),
                     ),
                     OutlinedButton(
                       onPressed: () => onNavTap('Contact'),
