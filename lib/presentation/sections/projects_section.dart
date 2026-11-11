@@ -3,6 +3,7 @@ import '../../core/responsive/responsive_layout.dart';
 import '../../core/theme/app_colors.dart';
 import '../../data/portfolio_data/portfolio_config.dart';
 import '../pages/case_study_page.dart';
+import '../pages/reliable_checkout_case_study_page.dart';
 
 class ProjectsSection extends StatelessWidget {
   const ProjectsSection({super.key});
@@ -10,6 +11,7 @@ class ProjectsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isMobile = ResponsiveLayout.isMobile(context);
+    final isTablet = ResponsiveLayout.isTablet(context);
 
     return Container(
       width: double.infinity,
@@ -37,10 +39,8 @@ class ProjectsSection extends StatelessWidget {
           const SizedBox(height: 48),
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = isMobile
-                  ? 1
-                  : (ResponsiveLayout.isTablet(context) ? 2 : 2);
-              final childAspectRatio = isMobile ? 0.8 : 1.2;
+              final crossAxisCount = isMobile ? 1 : 2;
+              final childAspectRatio = isMobile ? 0.78 : (isTablet ? 0.76 : 0.82);
 
               return GridView.builder(
                 shrinkWrap: true,
@@ -54,6 +54,8 @@ class ProjectsSection extends StatelessWidget {
                 itemCount: PortfolioConfig.projects.length,
                 itemBuilder: (context, index) {
                   final project = PortfolioConfig.projects[index];
+                  final isCdcare = project.id == 'cdcare-reliable-checkout';
+
                   return Container(
                     decoration: BoxDecoration(
                       color: AppColors.cardBackground,
@@ -72,7 +74,7 @@ class ProjectsSection extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Expanded(
-                          flex: 3,
+                          flex: 2,
                           child: Container(
                             color: AppColors.borderLight,
                             child: project.imagePath != null
@@ -80,26 +82,66 @@ class ProjectsSection extends StatelessWidget {
                                     project.imagePath!,
                                     fit: BoxFit.cover,
                                   )
-                                : const Center(
-                                    child: Icon(
-                                      Icons.image,
-                                      size: 64,
-                                      color: AppColors.secondaryText,
+                                : Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          AppColors.lightGreen,
+                                          AppColors.borderLight.withValues(alpha: 0.4),
+                                        ],
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            isCdcare
+                                                ? Icons.shopping_bag_outlined
+                                                : Icons.layers_outlined,
+                                            size: 48,
+                                            color: AppColors.accentGreen,
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            isCdcare
+                                                ? 'Case Study Prototype'
+                                                : 'Project Preview',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .labelMedium
+                                                ?.copyWith(
+                                                  color: AppColors.secondaryText,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                           ),
                         ),
                         Expanded(
-                          flex: 4,
+                          flex: 3,
                           child: Padding(
-                            padding: const EdgeInsets.all(24),
+                            padding: const EdgeInsets.all(20),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   project.name,
-                                  style: Theme.of(context).textTheme.titleLarge
-                                      ?.copyWith(fontWeight: FontWeight.bold),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17,
+                                        height: 1.25,
+                                      ),
                                 ),
                                 const SizedBox(height: 8),
                                 Expanded(
@@ -107,16 +149,16 @@ class ProjectsSection extends StatelessWidget {
                                     project.shortDescription,
                                     style: Theme.of(context)
                                         .textTheme
-                                        .bodyMedium
+                                        .bodySmall
                                         ?.copyWith(
                                           color: AppColors.secondaryText,
-                                          height: 1.5,
+                                          height: 1.45,
                                         ),
                                     maxLines: 3,
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 12),
                                 SingleChildScrollView(
                                   scrollDirection: Axis.horizontal,
                                   child: Row(
@@ -149,21 +191,31 @@ class ProjectsSection extends StatelessWidget {
                                     }).toList(),
                                   ),
                                 ),
-                                const SizedBox(height: 16),
+                                const SizedBox(height: 14),
                                 OutlinedButton(
                                   onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            CaseStudyPage(project: project),
-                                      ),
-                                    );
+                                    if (isCdcare) {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ReliableCheckoutCaseStudyPage(),
+                                        ),
+                                      );
+                                    } else {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              CaseStudyPage(project: project),
+                                        ),
+                                      );
+                                    }
                                   },
                                   style: OutlinedButton.styleFrom(
                                     minimumSize: const Size(
                                       double.infinity,
-                                      48,
+                                      44,
                                     ),
                                   ),
                                   child: const Text('View Case Study'),

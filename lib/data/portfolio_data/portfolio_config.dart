@@ -132,6 +132,49 @@ class PortfolioConfig {
 
   static const List<Project> projects = [
     Project(
+      id: 'cdcare-reliable-checkout',
+      name: 'Reliable Mobile Checkout — Independent Flutter Case Study',
+      shortDescription:
+          'A resilient mobile checkout prototype with Riverpod, addressing failure recovery, explicit loading states, and 29 automated tests.',
+      fullDescription:
+          'An independent case study and standalone Flutter prototype designed to explore resilient mobile checkout flows. Inspired by an independent exploration of CDcare\'s app where an address-submission flow appeared to enter an indeterminate loading state, this project implements deterministic state management, inline validation, explicit error recovery, and failure simulation to safeguard the user experience.',
+      problem:
+          'During independent exploration of the CDcare mobile app, an address-submission flow appeared to keep loading indefinitely without explicit feedback, timeout, or recovery options. While the root cause could not be verified and it is unknown whether other users are affected, checkout and address-submission flows in high-intent apps must prevent indeterminate states and data loss.',
+      solution:
+          'Engineered a standalone, feature-oriented Flutter prototype with Riverpod. Built explicit loading states, real-time address validation, non-destructive error recovery that preserves user input, configurable simulated failure scenarios (timeout, network drop, server error), and seamless progression to order confirmation.',
+      role: 'Mobile Engineer (Independent Exploration)',
+      features: [
+        'Deterministic Address Validation & Real-Time Feedback',
+        'Explicit Loading Indicators & Duplicate Submission Prevention',
+        'Configurable Failure Modes (Timeout, Network Drop, 500 Error)',
+        'Resilient Error Recovery with 100% Form State Preservation',
+        'Seamless Progression to Order Confirmation',
+        'Feature-Oriented Architecture with Riverpod',
+        '29 Automated Unit & Widget Tests',
+      ],
+      architecture:
+          'Feature-oriented architecture decoupling presentation, Riverpod application state, and mock/simulated checkout data sources.',
+      technologies: [
+        'Flutter',
+        'Dart',
+        'Riverpod',
+        'StateNotifier',
+        'Automated Testing',
+        'Clean Architecture',
+      ],
+      challenges: [
+        'Handling indeterminate loading and network timeouts without discarding user-entered address fields.',
+        'Simulating realistic edge cases (network drop, 500 server errors, timeouts) deterministically for testing.',
+      ],
+      solutions: [
+        'Implemented immutable form and submission states in Riverpod that decouple error banners from form controllers, allowing instant one-tap retry.',
+        'Designed mock checkout interceptors with configurable failure modes, validated by 29 automated tests.',
+      ],
+      githubUrl: 'https://github.com/Muhammad-Bashir24/cdcare',
+      liveUrl: null,
+      imagePath: null,
+    ),
+    Project(
       id: 'sendbash',
       name: 'SendBash',
       shortDescription:
